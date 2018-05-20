@@ -192,16 +192,3 @@ unsigned char * calc_hash(unsigned char* M, long long M_length, unsigned char *h
 }
 
 
-unsigned char* transf(unsigned char* h)
-{	
-	unsigned char * res;
-	unsigned char arr[128];
-	unsigned char hex_str[]= "0123456789abcdef";
-	for(int i=0;i<64;i++)
-	{
-		arr[i*2+0]=hex_str[(h[i] >> 4) & 0x0F];
-		arr[i*2+1]=hex_str[(h[i] ) & 0x0F];
-	}
-	memcpy(res, arr,128);
-	return res;
-}
