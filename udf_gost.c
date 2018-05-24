@@ -11,13 +11,10 @@
 
 char * gost512(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error)
 {	
-	char *M;
+	char *M = args->args[0];
 	unsigned char *h;
+	long long M_length=strlen(M)*8;
 	
-	*length=args->lengths[0];
-	memcpy(result, args->args[0],*length);
-	memcpy(M,result,*length);
-	long long M_length=*length*8;
 	unsigned char IV[64] =
 	{
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -28,16 +25,15 @@ char * gost512(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *le
 	};
 
 	h = calc_hash(M,M_length,IV);
-	unsigned char res[128];
+	*length=128;
+	
 	unsigned char hex_str[]= "0123456789abcdef";
 	for(int i=0;i<64;i++)
 	{
-		res[i*2+0]=hex_str[(h[i] >> 4) & 0x0F];
-		res[i*2+1]=hex_str[(h[i] ) & 0x0F];
+		result[i*2+0]=hex_str[(h[i] >> 4) & 0x0F];
+		result[i*2+1]=hex_str[(h[i] ) & 0x0F];
 	}
-	*length=128;
-	memcpy(result, res,*length);
-	result[*length]= 0;
+	
 	return result;
 }
 
@@ -67,12 +63,10 @@ void gost512_deinit (UDF_INIT *initid)
 
 char * gost256(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *length, char *is_null, char *error)
 {	
-	char *M;
+ 	char *M = args->args[0];
 	unsigned char *h;
-	*length=args->lengths[0];
-	memcpy(result, args->args[0],*length);
-	memcpy(M,result,*length);
-	long long M_length=*length*8;
+	
+	long long M_length=strlen(M)*8;
 	
 
 	unsigned char IV[64] = 
@@ -84,16 +78,14 @@ char * gost256(UDF_INIT *initid, UDF_ARGS *args, char *result, unsigned long *le
 	};
 
 	h = calc_hash(M,M_length,IV);
-	unsigned char res[128];
-	unsigned char hex_str[]= "0123456789abcdef";
-	for(int i=0;i<64;i++)
-	{
-		res[i*2+0]=hex_str[(h[i] >> 4) & 0x0F];
-		res[i*2+1]=hex_str[(h[i] ) & 0x0F];
-	}
 	*length=64;
-	memcpy(result, res,*length);
-	result[*length]= 0;
+	unsigned char hex_str[]= "0123456789abcdef";
+	for(int i=0;i<32;i++)
+	{
+		result[i*2+0]=hex_str[(h[i] >> 4) & 0x0F];
+		result[i*2+1]=hex_str[(h[i] ) & 0x0F];
+	}
+	
 	return result;
 }
 
